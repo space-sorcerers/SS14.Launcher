@@ -1,0 +1,4 @@
+interface:
+  display_name: "SS14 Launcher Codex"
+  short_description: "Code SS14 Launcher safely and idiomatically"
+  default_prompt: "Use $ss14-launcher-codex to implement the requested SS14 Launcher change with tests."

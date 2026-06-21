@@ -99,7 +99,7 @@ public static class CVars
     public static readonly CVarDef<int> InterruptibleDownloadKeepHours = CVarDef.Create("InterruptibleDownloadKeepHours", 7 * 24);
 
     /// <summary>
-    /// Whether to display override assets (trans rights).
+    /// Whether to display seasonal override assets.
     /// </summary>
     public static readonly CVarDef<bool> OverrideAssets = CVarDef.Create("OverrideAssets", true);
 

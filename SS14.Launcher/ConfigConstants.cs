@@ -28,15 +28,15 @@ public static class ConfigConstants
 
     private static readonly UrlFallbackSetStats StatsHubInfra = new(1);
 
-    public static readonly UrlFallbackSet AuthUrl = new(["https://auth.ss14.art/"], StatsHubInfra);
+    public static readonly UrlFallbackSet AuthUrl = new(["https://space.ss14.art/"], StatsHubInfra);
     public static readonly UrlFallbackSet[] DefaultHubUrls = [new(["https://hub.ss14.art/"], StatsHubInfra)];
     public const string DiscordUrl = "https://discord.gg/ss14";
     public const string AccountBaseUrl = "https://account.ss14.art/Identity/Account/";
     public const string AccountManagementUrl = $"{AccountBaseUrl}Manage";
     public const string AccountRegisterUrl = $"{AccountBaseUrl}Register";
     public const string AccountResendConfirmationUrl = $"{AccountBaseUrl}ResendEmailConfirmation";
-    public const string WebsiteUrl = "https://ss14.art";
-    public const string DownloadUrl = "https://ss14.art/";
+    public const string WebsiteUrl = "https://web.ss14.art";
+    public const string DownloadUrl = "https://web.ss14.art/";
     public const string NewsFeedUrl = "";
     //public const string TranslateUrl = "https://docs.ss14.art/en/general-development/contributing-translations.html";
 
