@@ -14,38 +14,78 @@
   <DockPanel LastChildFill="False">
     <TextBlock HorizontalAlignment="Center" DockPanel.Dock="Top" Classes="NanoHeadingMedium" Text="{loc:Loc login-login-title}" />
 
-    <TextBox DockPanel.Dock="Top" Name="NameBox" MaxWidth="300" Margin="0, 10, 0, 0"
-             Watermark="{loc:Loc login-login-username-watermark}"
-             Text="{Binding EditingUsername, Mode=TwoWay}" IsEnabled="{Binding !Busy}" />
-
-    <TextBox DockPanel.Dock="Top" Name="PasswordBox" MaxWidth="300" Margin="0, 4, 0, 0"
-             Watermark="{loc:Loc login-login-password-watermark}"
-             Text="{Binding EditingPassword, Mode=TwoWay}" RevealPassword="{Binding IsPasswordVisible}"
-             PasswordChar="•"
-             IsEnabled="{Binding !Busy}" />
-
-    <CheckBox DockPanel.Dock="Top" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4"
-              IsChecked="{Binding IsPasswordVisible}" Content="{loc:Loc login-login-show-password}" />
-
-    <DockPanel DockPanel.Dock="Top" LastChildFill="False" MaxWidth="300" Margin="0 20 0 0">
-      <Button DockPanel.Dock="Right" HorizontalAlignment="Center"
-              Content="{loc:Loc login-login-button-log-in}" Command="{Binding OnLogInButtonPressed}">
-        <Button.IsEnabled>
-          <MultiBinding Converter="{x:Static BoolConverters.And}">
-            <Binding Path="IsInputValid" />
-            <Binding Path="!Busy" />
-          </MultiBinding>
-        </Button.IsEnabled>
+    <!-- SSO Buttons -->
+    <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Center" Margin="0, 10, 0, 0" Spacing="8"
+                IsVisible="{Binding !ShowLegacyLogin}">
+      <Button MinWidth="200" Padding="12, 8" Command="{Binding SsoLogin}" CommandParameter="yandex"
+              IsVisible="{Binding HasYandex}" IsEnabled="{Binding !Busy}">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+          <TextBlock Text="{loc:Loc login-sso-yandex}" />
+        </StackPanel>
       </Button>
+      <Button MinWidth="200" Padding="12, 8" Command="{Binding SsoLogin}" CommandParameter="vkontakte"
+              IsVisible="{Binding HasVk}" IsEnabled="{Binding !Busy}">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+          <TextBlock Text="{loc:Loc login-sso-vk}" />
+        </StackPanel>
+      </Button>
+    </StackPanel>
 
-      <Button DockPanel.Dock="Left" HorizontalAlignment="Center" Content="{loc:Loc login-login-button-forgot}"
-              Command="{Binding ParentVM.SwitchToForgotPassword}" IsEnabled="{Binding !Busy}" />
-    </DockPanel>
+    <!-- SSO Code Input -->
+    <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Center" Margin="0, 10, 0, 0" Spacing="8"
+                IsVisible="{Binding ShowSsoCodeInput}">
+      <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="300"
+                 Text="{loc:Loc login-sso-code-hint}" />
+      <TextBox Name="SsoCodeBox" MaxWidth="300" Margin="0, 4, 0, 0"
+               Watermark="{loc:Loc login-sso-code-watermark}"
+               Text="{Binding EditingSsoCode, Mode=TwoWay}" IsEnabled="{Binding !Busy}" />
+      <Button HorizontalAlignment="Center" Content="{loc:Loc login-sso-code-submit}"
+              Command="{Binding OnSsoCodeSubmit}" IsEnabled="{Binding !Busy}" />
+    </StackPanel>
 
-    <DockPanel DockPanel.Dock="Top" LastChildFill="False" MaxWidth="300">
+    <!-- Legacy Login Separator -->
+    <Button DockPanel.Dock="Top" HorizontalAlignment="Center" Margin="0, 8, 0, 4"
+            IsVisible="{Binding !ShowLegacyLogin}"
+            Command="{Binding ToggleLegacyLogin}" IsEnabled="{Binding !Busy}"
+            Background="Transparent" BorderThickness="0"
+            Content="{loc:Loc login-sso-legacy-link}" />
+
+    <!-- Legacy Login Form -->
+    <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Center" Margin="0, 10, 0, 0" Spacing="4"
+                IsVisible="{Binding ShowLegacyLogin}">
+      <TextBox Name="NameBox" MaxWidth="300"
+               Watermark="{loc:Loc login-login-username-watermark}"
+               Text="{Binding EditingUsername, Mode=TwoWay}" IsEnabled="{Binding !Busy}" />
+
+      <TextBox Name="PasswordBox" MaxWidth="300" Margin="0, 4, 0, 0"
+               Watermark="{loc:Loc login-login-password-watermark}"
+               Text="{Binding EditingPassword, Mode=TwoWay}" RevealPassword="{Binding IsPasswordVisible}"
+               PasswordChar="•"
+               IsEnabled="{Binding !Busy}" />
+
+      <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4"
+                IsChecked="{Binding IsPasswordVisible}" Content="{loc:Loc login-login-show-password}" />
+
+      <DockPanel LastChildFill="False" MaxWidth="300" Margin="0 8 0 0">
+        <Button DockPanel.Dock="Right" HorizontalAlignment="Center"
+                Content="{loc:Loc login-login-button-log-in}" Command="{Binding OnLogInButtonPressed}">
+          <Button.IsEnabled>
+            <MultiBinding Converter="{x:Static BoolConverters.And}">
+              <Binding Path="IsInputValid" />
+              <Binding Path="!Busy" />
+            </MultiBinding>
+          </Button.IsEnabled>
+        </Button>
+
+        <Button DockPanel.Dock="Left" HorizontalAlignment="Center" Content="{loc:Loc login-login-button-forgot}"
+                Command="{Binding ParentVM.SwitchToForgotPassword}" IsEnabled="{Binding !Busy}" />
+      </DockPanel>
+
+      <DockPanel LastChildFill="False" MaxWidth="300">
         <Button DockPanel.Dock="Left" HorizontalAlignment="Center" Content="{loc:Loc login-login-button-resend}"
                 Command="{Binding ResendConfirmationPressed}"/>
-    </DockPanel>
+      </DockPanel>
+    </StackPanel>
 
     <Button DockPanel.Dock="Bottom" Classes="BigButton" Margin="0 4" HorizontalAlignment="Center"
             Content="{loc:Loc login-login-button-register}" Command="{Binding RegisterPressed}"

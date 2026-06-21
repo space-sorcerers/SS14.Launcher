@@ -144,6 +144,15 @@ login-login-button-register = Don't have an account? Register!
 login-login-busy-logging-in = Logging in…
 login-login-error-title = Unable to log in
 
+## Strings for SSO login
+
+login-sso-yandex = Sign in with Yandex
+login-sso-vk = Sign in with VK
+login-sso-legacy-link = Sign in with password
+login-sso-code-hint = After signing in through your browser, enter the code shown on the website here:
+login-sso-code-watermark = Authentication code
+login-sso-code-submit = Sign in
+
 ## Strings for the "register confirmation" view on login
 
 login-confirmation-confirmation-title = Register confirmation

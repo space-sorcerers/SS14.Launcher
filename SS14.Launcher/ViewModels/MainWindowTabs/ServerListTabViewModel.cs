@@ -7,6 +7,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
 using SS14.Launcher.Localization;
+using SS14.Launcher.Models.Logins;
 using SS14.Launcher.Models.ServerStatus;
 using SS14.Launcher.Utility;
 
@@ -68,7 +69,13 @@ public class ServerListTabViewModel : MainWindowTabViewModel
 
     public ServerListTabViewModel(MainWindowViewModel windowVm)
     {
+        var loginManager = Locator.Current.GetRequiredService<LoginManager>();
         Filters = new ServerListFiltersViewModel(windowVm.Cfg, _loc);
+        Filters.IsAdult = loginManager.ActiveAccount?.LoginInfo.IsAdult ?? true;
+        loginManager.WhenAnyValue(x => x.ActiveAccount).Subscribe(account =>
+        {
+            Filters.IsAdult = account?.LoginInfo.IsAdult ?? true;
+        });
         Filters.FiltersUpdated += FiltersOnFiltersUpdated;
 
         _windowVm = windowVm;

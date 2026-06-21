@@ -24,15 +24,11 @@ internal static class HttpSelfTest
 {
     private static int _httpSelfTestInitiated = 0;
 
-    // TODO: Move these to the correct urls! See #1 for details.
     private static readonly string[] SelfTestUrls =
     {
-        "http://central.spacestation14.io/launcher_version.txt",
-        "https://central.spacestation14.io/launcher_version.txt",
-        "http://cdn.centcomm.spacestation14.com/launcher_version.txt",
-        "https://cdn.centcomm.spacestation14.com/launcher_version.txt",
-        "http://moon.spacestation14.com/replays/",
-        "https://moon.spacestation14.com/replays/"
+        "http://launcher-data.ss14.art/info.json",
+        "https://launcher-data.ss14.art/info.json",
+        "https://auth.ss14.art/api/auth/ping"
     };
 
     public static void StartSelfTest()

@@ -28,25 +28,25 @@ public static class ConfigConstants
 
     private static readonly UrlFallbackSetStats StatsHubInfra = new(1);
 
-    public static readonly UrlFallbackSet AuthUrl = new(["https://auth.playss14.com/"], StatsHubInfra);
-    public static readonly UrlFallbackSet[] DefaultHubUrls = [new(["https://hub.playss14.com/"], StatsHubInfra)];
+    public static readonly UrlFallbackSet AuthUrl = new(["https://auth.ss14.art/"], StatsHubInfra);
+    public static readonly UrlFallbackSet[] DefaultHubUrls = [new(["https://hub.ss14.art/"], StatsHubInfra)];
     public const string DiscordUrl = "https://discord.gg/ss14";
-    public const string AccountBaseUrl = "https://account.playss14.com/Identity/Account/";
+    public const string AccountBaseUrl = "https://account.ss14.art/Identity/Account/";
     public const string AccountManagementUrl = $"{AccountBaseUrl}Manage";
     public const string AccountRegisterUrl = $"{AccountBaseUrl}Register";
     public const string AccountResendConfirmationUrl = $"{AccountBaseUrl}ResendEmailConfirmation";
-    public const string WebsiteUrl = "https://playss14.com";
-    public const string DownloadUrl = "https://playss14.com/about/nightlies/";
-    public const string NewsFeedUrl = "https://playss14.com/post/index.xml";
-    //public const string TranslateUrl = "https://docs.playss14.com/en/general-development/contributing-translations.html";
+    public const string WebsiteUrl = "https://ss14.art";
+    public const string DownloadUrl = "https://ss14.art/";
+    public const string NewsFeedUrl = "";
+    //public const string TranslateUrl = "https://docs.ss14.art/en/general-development/contributing-translations.html";
 
     private static readonly UrlFallbackSet RobustBuildsBaseUrl = new([
-        "https://robust-builds.playss14.com/"
+        "https://cdn.station14.ru/robust-builds/"
     ]);
 
     private static readonly UrlFallbackSet LauncherDataBaseUrl = new([
-        "https://launcher-data.playss14.com/",
-        "https://launcher-data.cdn.playss14.com/"
+        "https://launcher-data.ss14.art/",
+        "https://launcher-data.cdn.ss14.art/"
     ]);
 
     public static readonly UrlFallbackSet RobustBuildsManifest = RobustBuildsBaseUrl + "manifest.json";

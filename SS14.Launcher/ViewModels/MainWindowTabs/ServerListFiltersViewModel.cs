@@ -14,24 +14,24 @@ using static SS14.Launcher.Utility.HubUtility;
 
 namespace SS14.Launcher.ViewModels.MainWindowTabs;
 
-public sealed partial class ServerListFiltersViewModel : ObservableObject
-{
-    private readonly LocalizationManager _loc;
-    private readonly DataManager _dataManager;
+    public sealed partial class ServerListFiltersViewModel : ObservableObject
+    {
+        private readonly LocalizationManager _loc;
+        private readonly DataManager _dataManager;
 
-    private int _totalServers;
-    private int _filteredServers;
+        private int _totalServers;
+        private int _filteredServers;
+
+        public bool IsAdult { get; set; } = true;
 
     private readonly FilterListCollection _filtersLanguage = new();
     private readonly FilterListCollection _filtersRegion = new();
     private readonly FilterListCollection _filtersRolePlay = new();
-    private readonly FilterListCollection _filtersEighteenPlus = new();
     private readonly FilterListCollection _filtersHub = new();
 
     public ObservableCollection<ServerFilterViewModel> FiltersLanguage => _filtersLanguage;
     public ObservableCollection<ServerFilterViewModel> FiltersRegion => _filtersRegion;
     public ObservableCollection<ServerFilterViewModel> FiltersRolePlay => _filtersRolePlay;
-    public ObservableCollection<ServerFilterViewModel> FiltersEighteenPlus => _filtersEighteenPlus;
     public ObservableCollection<ServerFilterViewModel> FiltersHub => _filtersHub;
 
     public ServerFilterViewModel FilterPlayerCountHideEmpty { get; }
@@ -62,16 +62,6 @@ public sealed partial class ServerListFiltersViewModel : ObservableObject
     {
         _dataManager = dataManager;
         _loc = loc;
-
-        FiltersEighteenPlus.Add(new ServerFilterViewModel(
-            _loc.GetString("filters-18-yes-desc"),
-            _loc.GetString("filters-18-yes"),
-            new ServerFilter(ServerFilterCategory.EighteenPlus, ServerFilter.DataTrue), this));
-
-        FiltersEighteenPlus.Add(new ServerFilterViewModel(
-            _loc.GetString("filters-18-no-desc"),
-            _loc.GetString("filters-18-no"),
-            new ServerFilter(ServerFilterCategory.EighteenPlus, ServerFilter.DataFalse), this));
 
         FilterPlayerCountHideEmpty = new ServerFilterViewModel(
             _loc.GetString("filters-player-count-hide-empty-desc"),
@@ -260,22 +250,6 @@ public sealed partial class ServerListFiltersViewModel : ObservableObject
         if (GetFilter(ServerFilter.PlayerCountMax))
             maxPlayerCount = _dataManager.GetCVar(CVars.FilterPlayerCountMaxValue);
 
-        // Precache 18+ bool.
-        bool? eighteenPlus = null;
-        if (GetFilter(ServerFilterCategory.EighteenPlus, ServerFilter.DataTrue))
-        {
-            eighteenPlus = true;
-        }
-
-        if (GetFilter(ServerFilterCategory.EighteenPlus, ServerFilter.DataFalse))
-        {
-            // Having both
-            if (eighteenPlus == true)
-                eighteenPlus = null;
-            else
-                eighteenPlus = false;
-        }
-
         for (var i = 0; i < list.Count; i++)
         {
             var server = list[i];
@@ -291,13 +265,9 @@ public sealed partial class ServerListFiltersViewModel : ObservableObject
 
         bool DoesServerMatch(ServerStatusData server)
         {
-            // 18+ checks
-            if (eighteenPlus != null)
-            {
-                var serverEighteenPlus = server.Tags.Contains(Tags.TagEighteenPlus);
-                if (eighteenPlus != serverEighteenPlus)
-                    return false;
-            }
+            // Auto-filter 18+ servers for non-adult users
+            if (!IsAdult && server.Tags.Contains(Tags.TagEighteenPlus))
+                return false;
 
             if (!CheckCategoryFilterSet(categorySetLanguage, server.Tags, Tags.TagLanguage, PrimaryLanguageTag))
                 return false;

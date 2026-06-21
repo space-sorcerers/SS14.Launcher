@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -18,9 +20,15 @@ public class LoginViewModel : BaseLoginViewModel
 
     [Reactive] public string EditingUsername { get; set; } = "";
     [Reactive] public string EditingPassword { get; set; } = "";
+    [Reactive] public string EditingSsoCode { get; set; } = "";
 
     [Reactive] public bool IsInputValid { get; private set; }
     [Reactive] public bool IsPasswordVisible { get; set; }
+    [Reactive] public bool ShowLegacyLogin { get; set; }
+    [Reactive] public bool ShowSsoCodeInput { get; set; }
+    [Reactive] public bool HasYandex { get; set; }
+    [Reactive] public bool HasVk { get; set; }
+    [Reactive] public bool HasLegacy { get; set; }
 
     public LoginViewModel(MainWindowLoginViewModel parentVm, AuthApi authApi,
         LoginManager loginMgr, DataManager dataManager) : base(parentVm)
@@ -32,6 +40,55 @@ public class LoginViewModel : BaseLoginViewModel
 
         this.WhenAnyValue(x => x.EditingUsername, x => x.EditingPassword)
             .Subscribe(s => { IsInputValid = !string.IsNullOrEmpty(s.Item1) && !string.IsNullOrEmpty(s.Item2); });
+
+        _ = LoadAuthMethods();
+    }
+
+    private async Task LoadAuthMethods()
+    {
+        var methods = await _authApi.GetAuthMethodsAsync();
+        if (methods == null)
+            methods = new[] { "legacy", "yandex", "vkontakte" };
+
+        HasYandex = methods.Contains("yandex");
+        HasVk = methods.Contains("vkontakte");
+        HasLegacy = methods.Contains("legacy");
+    }
+
+    public void SsoLogin(string provider)
+    {
+        var url = $"{ConfigConstants.AccountBaseUrl}../../LauncherSSO";
+        Helpers.OpenUri(url);
+        ShowSsoCodeInput = true;
+    }
+
+    public async void OnSsoCodeSubmit()
+    {
+        var code = EditingSsoCode?.Trim();
+        if (string.IsNullOrEmpty(code) || Busy)
+            return;
+
+        Busy = true;
+        BusyText = _loc.GetString("login-login-busy-logging-in");
+        try
+        {
+            var resp = await _authApi.SsoLoginAsync(code);
+
+            var request = new AuthApi.AuthenticateRequest(code, code);
+            await DoLogin(this, request, resp, _loginMgr, _authApi);
+
+            _dataManager.CommitConfig();
+        }
+        finally
+        {
+            Busy = false;
+            BusyText = _loc.GetString("login-login-busy-logging-in");
+        }
+    }
+
+    public void ToggleLegacyLogin()
+    {
+        ShowLegacyLogin = !ShowLegacyLogin;
     }
 
     public async void OnLogInButtonPressed()
@@ -72,13 +129,6 @@ public class LoginViewModel : BaseLoginViewModel
             var oldLogin = loginMgr.Logins.Lookup(loginInfo.UserId);
             if (oldLogin.HasValue)
             {
-                // Already had this login, apparently.
-                // Thanks user.
-                //
-                // Log the OLD token out since we don't need two of them.
-                // This also has the upside of re-available-ing the account
-                // if the user used the main login prompt on an account we already had, but as expired.
-
                 await authApi.LogoutTokenAsync(oldLogin.Value.LoginInfo.Token.Token);
                 loginMgr.ActiveAccountId = loginInfo.UserId;
                 loginMgr.UpdateToNewToken(loginMgr.ActiveAccount!, loginInfo.Token);
@@ -103,13 +153,11 @@ public class LoginViewModel : BaseLoginViewModel
 
     public void RegisterPressed()
     {
-        // Registration is purely via website now, sorry.
         Helpers.OpenUri(ConfigConstants.AccountRegisterUrl);
     }
 
     public void ResendConfirmationPressed()
     {
-        // Registration is purely via website now, sorry.
         Helpers.OpenUri(ConfigConstants.AccountResendConfirmationUrl);
     }
 }

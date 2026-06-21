@@ -6,7 +6,7 @@ namespace SS14.Launcher.Api;
 
 public static class ServerApi
 {
-    // https://docs.spacestation14.io/en/engine/http-api
+    // https://docs.ss14.art/en/engine/http-api
     public sealed record ServerStatus(
         [property: JsonPropertyName("name")] string? Name,
         [property: JsonPropertyName("players")]

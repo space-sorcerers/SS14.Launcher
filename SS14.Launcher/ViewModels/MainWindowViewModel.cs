@@ -40,7 +40,6 @@ public sealed class MainWindowViewModel : ViewModelBase, IErrorOverlayOwner
 
     public HomePageViewModel HomeTab { get; }
     public ServerListTabViewModel ServersTab { get; }
-    public NewsTabViewModel NewsTab { get; }
     public OptionsTabViewModel OptionsTab { get; }
 
     public MainWindowViewModel()
@@ -52,14 +51,12 @@ public sealed class MainWindowViewModel : ViewModelBase, IErrorOverlayOwner
         _loc = LocalizationManager.Instance;
 
         ServersTab = new ServerListTabViewModel(this);
-        NewsTab = new NewsTabViewModel();
         HomeTab = new HomePageViewModel(this);
         OptionsTab = new OptionsTabViewModel();
 
         var tabs = new List<MainWindowTabViewModel>();
         tabs.Add(HomeTab);
         tabs.Add(ServersTab);
-        tabs.Add(NewsTab);
         tabs.Add(OptionsTab);
 #if DEVELOPMENT
         tabs.Add(new DevelopmentTabViewModel());

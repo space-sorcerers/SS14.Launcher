@@ -23,6 +23,76 @@ public sealed class AuthApi
         _httpClient = http;
     }
 
+    public async Task<string[]?> GetAuthMethodsAsync()
+    {
+        try
+        {
+            var authUrl = (ConfigConstants.AuthUrl + "api/auth/methods").GetMostSuccessfulUrl();
+            using var resp = await _httpClient.GetAsync(authUrl);
+
+            if (resp.IsSuccessStatusCode)
+            {
+                var result = await resp.Content.AsJson<AuthMethodsResponse>();
+                return result.Methods;
+            }
+
+            return null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public async Task<AuthenticateResult> SsoLoginAsync(string code)
+    {
+        try
+        {
+            var authUrl = ConfigConstants.AuthUrl + "api/auth/sso";
+
+            using var resp = await _httpClient.PostAsJsonAsync(authUrl, new SsoLoginRequestDto(code));
+
+            if (resp.IsSuccessStatusCode)
+            {
+                var respJson = await resp.Content.AsJson<AuthenticateResponse>();
+                var token = new LoginToken(respJson.Token, respJson.ExpireTime);
+                return new AuthenticateResult(new LoginInfo
+                {
+                    UserId = respJson.UserId,
+                    Token = token,
+                    Username = respJson.Username,
+                    IsAdult = respJson.IsAdult
+                });
+            }
+
+            if (resp.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                var respJson = await resp.Content.AsJson<AuthenticateDenyResponse>();
+                return new AuthenticateResult(respJson.Errors, respJson.Code);
+            }
+
+            Log.Error("Server returned unexpected HTTP status code: {responseCode}", resp.StatusCode);
+            return new AuthenticateResult(
+                new[] { "Server returned unknown error" },
+                AuthenticateDenyResponseCode.UnknownError);
+        }
+        catch (JsonException e)
+        {
+            Log.Error(e, "JsonException in SsoLoginAsync");
+            return new AuthenticateResult(
+                new[] { "Server sent invalid response" },
+                AuthenticateDenyResponseCode.UnknownError);
+        }
+        catch (HttpRequestException httpE)
+        {
+            Log.Error(httpE, "HttpRequestException in SsoLoginAsync");
+            HttpSelfTest.StartSelfTest();
+            return new AuthenticateResult(
+                new[] { $"Connection error to authentication server: {httpE.Message}" },
+                AuthenticateDenyResponseCode.UnknownError);
+        }
+    }
+
     public async Task<AuthenticateResult> AuthenticateAsync(AuthenticateRequest request)
     {
         try
@@ -39,7 +109,8 @@ public sealed class AuthApi
                 {
                     UserId = respJson.UserId,
                     Token = token,
-                    Username = respJson.Username
+                    Username = respJson.Username,
+                    IsAdult = respJson.IsAdult
                 });
             }
 
@@ -302,7 +373,7 @@ public sealed class AuthApi
         }
     }
 
-    public sealed record AuthenticateResponse(string Token, string Username, Guid UserId, DateTimeOffset ExpireTime);
+    public sealed record AuthenticateResponse(string Token, string Username, Guid UserId, DateTimeOffset ExpireTime, bool IsAdult);
 
     public sealed record AuthenticateDenyResponse(string[] Errors, AuthenticateDenyResponseCode Code);
 
@@ -337,6 +408,10 @@ public sealed class AuthApi
     public sealed record RefreshRequest(string Token);
 
     public sealed record RefreshResponse(DateTimeOffset ExpireTime, string NewToken);
+
+    public sealed record AuthMethodsResponse(string[] Methods);
+
+    public sealed record SsoLoginRequestDto(string Code);
 }
 
 public readonly struct AuthenticateResult

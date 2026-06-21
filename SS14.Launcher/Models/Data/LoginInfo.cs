@@ -12,6 +12,8 @@ public class LoginInfo : ReactiveObject
     public string Username { get; set; } = default!;
     [Reactive]
     public LoginToken Token { get; set; }
+    [Reactive]
+    public bool IsAdult { get; set; } = true;
 
     public override string ToString()
     {
