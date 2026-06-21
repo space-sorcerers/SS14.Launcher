@@ -45,8 +45,7 @@ public static class ConfigConstants
     ]);
 
     private static readonly UrlFallbackSet LauncherDataBaseUrl = new([
-        "https://launcher-data.ss14.art/",
-        "https://launcher-data.cdn.ss14.art/"
+        "https://web.ss14.art/launcher-data/"
     ]);
 
     public static readonly UrlFallbackSet RobustBuildsManifest = RobustBuildsBaseUrl + "manifest.json";
