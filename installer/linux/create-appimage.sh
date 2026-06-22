@@ -7,11 +7,31 @@ APP_DIR="bin/appimage/SS14.Launcher.AppDir"
 APPDATA_DIR="$APP_DIR/usr/share/metainfo"
 DESKTOP_FILE="$APP_DIR/SS14.Launcher.desktop"
 APPRUN="$APP_DIR/AppRun"
-ICON_DIR="$APP_DIR/usr/share/icons/hicolor/scalable/apps"
+ICON_FILE="$APP_DIR/ss14-launcher.png"
 
 mkdir -p "$APP_DIR"
 mkdir -p "$APPDATA_DIR"
-mkdir -p "$ICON_DIR"
+
+# Generate minimal 256x256 PNG icon using Python
+python3 -c "
+import struct, zlib
+def create_png(width, height, color):
+    def chunk(ctype, data):
+        c = ctype + data
+        return struct.pack('>I', len(data)) + c + struct.pack('>I', zlib.crc32(c) & 0xffffffff)
+    header = b'\\x89PNG\\r\\n\\x1a\\n'
+    ihdr = chunk(b'IHDR', struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0))
+    raw = b''
+    for y in range(height):
+        raw += b'\\x00'
+        for x in range(width):
+            raw += bytes(color)
+    idat = chunk(b'IDAT', zlib.compress(raw))
+    iend = chunk(b'IEND', b'')
+    return header + ihdr + idat + iend
+with open('$ICON_FILE', 'wb') as f:
+    f.write(create_png(256, 256, (50, 50, 80)))
+"
 
 cp -r "$PUBLISH_DIR"/* "$APP_DIR/"
 
