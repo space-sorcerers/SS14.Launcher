@@ -47,13 +47,18 @@ cat > "$APPDATA_DIR/ss14-launcher.appdata.xml" << EOF
 </component>
 EOF
 
-# Download appimagetool
-APPIMAGETOOL="bin/appimage/appimagetool"
-if [ ! -f "$APPIMAGETOOL" ]; then
+# Download appimagetool (extract to avoid FUSE dependency on CI)
+APPIMAGETOOL_DIR="bin/appimage/appimagetool-extracted"
+if [ ! -d "$APPIMAGETOOL_DIR" ]; then
     mkdir -p bin/appimage
-    curl -sL "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -o "$APPIMAGETOOL"
-    chmod +x "$APPIMAGETOOL"
+    curl -sL "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -o "bin/appimage/appimagetool.AppImage"
+    chmod +x "bin/appimage/appimagetool.AppImage"
+    cd bin/appimage
+    ./appimagetool.AppImage --appimage-extract > /dev/null 2>&1
+    mv squashfs-root appimagetool-extracted
+    cd ../..
 fi
+APPIMAGETOOL="$APPIMAGETOOL_DIR/AppRun"
 
 mkdir -p bin/installers
 ARCH=x86_64 "$APPIMAGETOOL" "$APP_DIR" "bin/installers/SS14.Launcher_Linux_${VERSION}.AppImage"

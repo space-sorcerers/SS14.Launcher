@@ -27,17 +27,10 @@ def main():
 
     if "windows" in platforms:
         publish_windows(x64_only)
-        make_windows_installer()
     if "linux" in platforms:
         publish_linux(x64_only)
-        make_linux_appimage()
     if "osx" in platforms:
         publish_osx()
-        make_macos_dmg()
-    if "installers" in platforms:
-        make_windows_installer()
-        make_macos_dmg()
-        make_linux_appimage()
 
 
 def publish_windows(x64_only: bool):
@@ -173,16 +166,6 @@ def dotnet_publish(proj: str, rid: str, self_contained: bool, *args: str):
         "Release",
         "/nologo",
         *args)
-
-def make_windows_installer():
-    os.makedirs("bin/installers", exist_ok=True)
-    run("iscc", "installer/windows/setup.iss")
-
-def make_macos_dmg():
-    run("bash", "installer/macos/create-dmg.sh")
-
-def make_linux_appimage():
-    run("bash", "installer/linux/create-appimage.sh")
 
 if __name__ == "__main__":
     main()
