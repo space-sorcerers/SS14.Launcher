@@ -16,7 +16,7 @@ DMG_SIZE_MB=500
 hdiutil create -size "${DMG_SIZE_MB}m" -fs HFS+ -volname "SS14 Launcher" "$TEMP_DMG"
 
 # Mount and copy app
-MOUNT_POINT=$(hdiutil attach "$TEMP_DMG" -nobrowse -noautoopen | tail -1 | awk '{print $3}')
+MOUNT_POINT=$(hdiutil attach "$TEMP_DMG" -nobrowse -noautoopen | tail -1 | awk -F'\t' '{print $NF}')
 cp -R "$PUBLISH_DIR/$APP_NAME" "$MOUNT_POINT/"
 ln -s /Applications "$MOUNT_POINT/Applications"
 hdiutil detach "$MOUNT_POINT" -quiet
