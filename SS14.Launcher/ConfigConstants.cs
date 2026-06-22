@@ -45,7 +45,7 @@ public static class ConfigConstants
     ]);
 
     private static readonly UrlFallbackSet LauncherDataBaseUrl = new([
-        "https://web.ss14.art/launcher-data/"
+        "https://space-sorcerers.github.io/SS14.Launcher/launcher-data/"
     ]);
 
     public static readonly UrlFallbackSet RobustBuildsManifest = RobustBuildsBaseUrl + "manifest.json";
