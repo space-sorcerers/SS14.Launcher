@@ -53,6 +53,12 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Patch version
+        run: |
+          sed -i 's/CurrentLauncherVersion\s*=\s*"[^"]*"/CurrentLauncherVersion = "${{ inputs.version }}"/' \
+            SS14.Launcher/ConfigConstants.cs
+          echo "Patched version to ${{ inputs.version }}"
+
       - name: Build & Test
         run: |
           dotnet restore
@@ -87,6 +93,13 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Patch version
+        shell: bash
+        run: |
+          sed -i 's/CurrentLauncherVersion\s*=\s*"[^"]*"/CurrentLauncherVersion = "${{ inputs.version }}"/' \
+            SS14.Launcher/ConfigConstants.cs
+          echo "Patched version to ${{ inputs.version }}"
 
       - name: Build Windows
         run: python publish.py windows --x64-only
